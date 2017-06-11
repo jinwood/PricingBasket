@@ -13,11 +13,8 @@
    have a UI over the top of this and not rely on the user to type the correct thing!
    
  */
-
-using PricingBasket.Factories;
 using PricingBasket.Objects;
 using System;
-using System.Linq;
 
 namespace PricingBasket
 {
