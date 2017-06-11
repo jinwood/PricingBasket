@@ -1,4 +1,20 @@
-﻿using PricingBasket.Factories;
+﻿/*
+ This is my solution to the BJSS Coding test
+ I'm fairly happy with how it has turned out. It satisfies all the conditions outlined in the
+ assignment. There are some hardcoded values such as pricings, which in a production environment
+ you would not want to use, but for the purpose of this test I thought it would be OK to leave for now.
+
+ Improvements I would make given more time:
+ - Implement IOC. Currently the solution is not very flexible, and there are some hard dependencies between
+   most of the classes used. For example, what if we wanted to use an OfferLogicFactory that took in 
+   discount codes and then used an external service to validate them? What if we wanted to test different implementations
+   of the concrete classes? Not possible currently. Some of the classes could be static (ItemMapper for example).
+ - Restrict the user input. The program currently allows any form of input string. It would be more appropriate to 
+   have a UI over the top of this and not rely on the user to type the correct thing!
+   
+ */
+
+using PricingBasket.Factories;
 using PricingBasket.Objects;
 using System;
 using System.Linq;
@@ -9,111 +25,18 @@ namespace PricingBasket
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Enter items, seperated by spaces");
+            var items = Console.ReadLine();
+
             var basket = new Basket();
-
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Bread
-            });
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Bread
-            });
-
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Apple
-            });
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Apple
-            });
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Apple
-            });
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Apple
-            });
-
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Soup
-            });
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Soup
-            });
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Soup
-            });
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Soup
-            });
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Soup
-            });
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Soup
-            });
-            basket.Items.Add(new Item
-            {
-                Type = ItemType.Soup
-            });
-
+            basket.Items = new ItemMapper().MapStringToItemList(items);
             basket.SetPrices();
 
             Console.WriteLine($"Subtotal: \u00A3 {basket.TotalPrice()}");
-            SetDiscounts(basket);
+            var processor = new DiscountProcessor();
+            processor.SetBasketDiscounts(basket);
             Console.WriteLine($"Total: \u00A3{basket.DiscountedPrice}");
             Console.ReadLine();
-        }
-
-        private static void SetDiscounts(Basket basket)
-        {
-            var types = Enum.GetValues(typeof(ItemType)).Cast<ItemType>();
-            var offerLogicFactory = new OfferLogicFactory();
-
-            //iterate over all available item types so we can 
-            //break up our item list by type and apply discounts
-            foreach (var type in types)
-            {
-                if (type == ItemType.Unknown)
-                    continue;
-
-                if (!basket.Items.Any(x => x.Type == type))
-                    continue;
-
-                var itemsOfType = basket.Items.Where(x => x.Type == type).ToList();
-                var offerLogic = offerLogicFactory.GetLogicForItem(type);
-
-                if (offerLogic == null)
-                {
-                    Console.WriteLine($"{type} - (No offers available)");
-                    continue;
-                }
-
-                foreach (var logic in offerLogic)
-                {
-                    if (logic.IsOfferApplicable(itemsOfType))
-                    {
-                        var discount = logic.Discount(itemsOfType);
-                        basket.TotalDiscount += discount;
-                        Console.WriteLine($"{type} {logic.Description}: - \u00A3{discount}");
-                    }
-                    else
-                    {
-                        Console.WriteLine("(No offers available)");
-                    }
-
-                }
-            }
-            basket.DiscountedPrice = basket.TotalPrice() - basket.TotalDiscount;
         }
     }
 
