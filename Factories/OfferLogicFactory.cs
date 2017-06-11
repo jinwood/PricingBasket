@@ -1,17 +1,16 @@
-﻿using PricingBasket.Interfaces;
+﻿using System;
+using PricingBasket.Interfaces;
 using PricingBasket.Objects;
 using PricingBasket.OfferLogic;
 using System.Collections.Generic;
 
 namespace PricingBasket.Factories
 {
-    public class OfferFactory : IOfferLogicFactory
+    public class OfferLogicFactory : IOfferLogicFactory
     {
-        public List<IOfferLogic> GetLogicForItem(Item item)
+        public List<IOfferLogic> GetLogicForItem(ItemType type)
         {
-            if (item == null)
-                return null;
-            switch (item.Type)
+            switch (type)
             {
                 case ItemType.Apple:
                     return new List<IOfferLogic> { new TenPercentOff() };

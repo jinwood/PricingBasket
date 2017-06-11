@@ -77,8 +77,10 @@ namespace PricingBasket
         private static void SetDiscounts(Basket basket)
         {
             var types = Enum.GetValues(typeof(ItemType)).Cast<ItemType>();
-            var offerFactory = new OfferFactory();
+            var offerLogicFactory = new OfferLogicFactory();
 
+            //iterate over all available item types so we can 
+            //break up our item list by type and apply discounts
             foreach (var type in types)
             {
                 if (type == ItemType.Unknown)
@@ -88,7 +90,7 @@ namespace PricingBasket
                     continue;
 
                 var itemsOfType = basket.Items.Where(x => x.Type == type).ToList();
-                var offerLogic = offerFactory.GetLogicForItem(itemsOfType.FirstOrDefault());
+                var offerLogic = offerLogicFactory.GetLogicForItem(type);
 
                 if (offerLogic == null)
                 {
@@ -110,8 +112,6 @@ namespace PricingBasket
                     }
 
                 }
-
-
             }
             basket.DiscountedPrice = basket.TotalPrice() - basket.TotalDiscount;
         }

@@ -2,6 +2,7 @@
 using PricingBasket.Interfaces;
 using PricingBasket.Objects;
 using System.Linq;
+using System;
 
 namespace PricingBasket.OfferLogic
 {
@@ -23,6 +24,8 @@ namespace PricingBasket.OfferLogic
 
         public bool IsOfferApplicable(List<Item> items)
         {
+            if (items == null) throw new ArgumentNullException();
+
             if (items.Any(i => i.Type == ItemType.Apple))
                 return true;
 

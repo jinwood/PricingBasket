@@ -16,8 +16,6 @@ namespace PricingBasket.Objects
 
         //in a production system the item prices should not be hardcoded
         //perhaps fetched from a db or external service
-
-        //the offer logic should be fetched via a factory method (todo)
         public void SetPrices()
         {
             foreach (var item in Items)

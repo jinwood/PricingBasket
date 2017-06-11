@@ -5,6 +5,6 @@ namespace PricingBasket.Interfaces
 {
     public interface IOfferLogicFactory
     {
-        List<IOfferLogic> GetLogicForItem(Item item);
+        List<IOfferLogic> GetLogicForItem(ItemType type);
     }
 }
