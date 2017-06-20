@@ -13,8 +13,10 @@
    have a UI over the top of this and not rely on the user to type the correct thing!
    
  */
+using PricingBasket.Factories;
 using PricingBasket.Objects;
 using System;
+using System.Globalization;
 
 namespace PricingBasket
 {
@@ -22,18 +24,24 @@ namespace PricingBasket
     {
         static void Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
             Console.WriteLine("Enter items, seperated by spaces");
             var items = Console.ReadLine();
 
-            var basket = new Basket();
-            basket.Items = new ItemMapper().MapStringToItemList(items);
-            basket.SetPrices();
+            var basket = new Basket()
+            {
+                Items = new ItemMapper().MapStringToItemList(items)
+            };
 
-            Console.WriteLine($"Subtotal: \u00A3 {basket.TotalPrice()}");
+            var priceFactory = new PriceFactory();
+            priceFactory.SetItemPrices(basket.Items);
+
+            Console.WriteLine($"Subtotal: £ {basket.TotalPrice().ToString("C", CultureInfo.CurrentCulture)}");
             var processor = new DiscountProcessor();
             processor.SetBasketDiscounts(basket);
-            Console.WriteLine($"Total: \u00A3{basket.DiscountedPrice}");
-            Console.ReadLine();
+            Console.WriteLine($"Total: {basket.DiscountedPrice.ToString("C",CultureInfo.CurrentCulture)}");
+            Environment.Exit(0);
         }
     }
 

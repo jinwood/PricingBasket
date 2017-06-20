@@ -2,6 +2,7 @@
 using PricingBasket.Interfaces;
 using PricingBasket.Objects;
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace PricingBasket
@@ -13,8 +14,11 @@ namespace PricingBasket
         //in a method within the Basket class?
         public Basket SetBasketDiscounts(Basket basket)
         {
+            if (basket == null) return null;
+
             var types = Enum.GetValues(typeof(ItemType)).Cast<ItemType>();
             var offerLogicFactory = new OfferLogicFactory();
+            bool? basketContainsOffers = null;
 
             //iterate over all available item types so we can 
             //break up our item list by type and apply discounts
@@ -31,7 +35,7 @@ namespace PricingBasket
 
                 if (offerLogic == null)
                 {
-                    Console.WriteLine($"{type} - (No offers available)");
+                    basketContainsOffers = false;
                     continue;
                 }
 
@@ -39,18 +43,20 @@ namespace PricingBasket
                 {
                     if (logic.IsOfferApplicable(itemsOfType))
                     {
+                        basketContainsOffers = true;
                         var discount = logic.Discount(itemsOfType);
                         basket.TotalDiscount += discount;
-                        Console.WriteLine($"{type} {logic.Description}: - \u00A3{discount}");
+                        Console.WriteLine($"{type} {logic.Description}: -{discount.ToString("C",CultureInfo.CurrentCulture)}");
                     }
                     else
                     {
-                        Console.WriteLine("(No offers available)");
+                        if(basketContainsOffers != null) basketContainsOffers = false;
                     }
-
                 }
             }
             basket.DiscountedPrice = basket.TotalPrice() - basket.TotalDiscount;
+
+            if (basketContainsOffers != null && !(bool)basketContainsOffers) Console.WriteLine($"(No offers available)");
 
             return basket;
         }

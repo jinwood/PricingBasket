@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace PricingBasket.Objects
+﻿namespace PricingBasket.Objects
 {
     public class Item
     {

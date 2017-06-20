@@ -1,24 +1,18 @@
-﻿using PricingBasket.OfferLogic;
+﻿using PricingBasket.Interfaces;
+using PricingBasket.Objects;
 using System.Collections.Generic;
 
-namespace PricingBasket.Objects
+namespace PricingBasket.Factories
 {
-    public class Basket
+    public class PriceFactory : IPriceFactory
     {
-        public List<Item> Items { get; set; }
-        public decimal TotalDiscount { get; set; }
-        public decimal DiscountedPrice { get; set; }
-
-        public Basket()
-        {
-            Items = new List<Item>();
-        }
-
         //in a production system the item prices should not be hardcoded
         //perhaps fetched from a db or external service
-        public void SetPrices()
+        public List<Item> SetItemPrices(List<Item> items)
         {
-            foreach (var item in Items)
+            if (items == null) return null;
+
+            foreach (var item in items)
             {
                 switch (item.Type)
                 {
@@ -35,21 +29,12 @@ namespace PricingBasket.Objects
                         item.Price = 0.65m;
                         break;
                     case ItemType.Unknown:
+                    default:
                         item.Price = 0m;
                         break;
                 }
             }
-        }
-
-        public decimal TotalPrice()
-        {
-            var totalPrice = 0.0m;
-
-            foreach (var item in Items)
-            {
-                totalPrice += item.Price;
-            }
-            return totalPrice;
+            return items;
         }
     }
 }
